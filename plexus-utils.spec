@@ -48,7 +48,14 @@ URL:            http://plexus.codehaus.org/
 Source0:        plexus-utils-1.2.tar.gz
 Source1:        plexus-utils-1.2-build.xml
 # build it with maven2-generated ant build.xml
-
+%if %{gcj_support}
+Requires(post): java-gcj-compat
+Requires(postun): java-gcj-compat
+BuildRequires:  java-gcj-compat-devel
+%else
+BuildArch:      noarch
+BuildRequires:  java-devel
+%endif
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires:  ant
