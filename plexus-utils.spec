@@ -37,7 +37,7 @@
 
 Name:           plexus-utils
 Version:        1.2
-Release:        %mkrel 2.1.1
+Release:        %mkrel 2.1.2
 Epoch:          0
 Summary:        Plexus Common Utilities
 License:        Apache License
@@ -49,8 +49,6 @@ Source0:        plexus-utils-1.2.tar.gz
 Source1:        plexus-utils-1.2-build.xml
 # build it with maven2-generated ant build.xml
 %if %{gcj_support}
-Requires(post): java-gcj-compat
-Requires(postun): java-gcj-compat
 BuildRequires:  java-gcj-compat-devel
 %else
 BuildArch:      noarch
