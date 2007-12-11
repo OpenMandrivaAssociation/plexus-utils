@@ -63,6 +63,12 @@ Requires(postun): jpackage-utils
 %if %{with_maven}
 BuildRequires:  maven2 >= 0:2.0.4
 BuildRequires:  maven2-plugin-surefire
+BuildRequires:  maven2-plugin-resources
+BuildRequires:  maven2-plugin-compiler
+BuildRequires:  maven2-plugin-jar
+BuildRequires:  maven2-plugin-install
+BuildRequires:  maven2-plugin-release
+BuildRequires:  maven2-plugin-javadoc
 %endif
 
 %description
