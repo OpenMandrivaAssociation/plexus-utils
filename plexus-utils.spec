@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2005, JPackage Project
+# Copyright (c) 2000-2007, JPackage Project
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,13 +31,13 @@
 # If you want to build with maven,
 # give rpmbuild option '--with maven'
 
-%define with_maven %{!?_with_maven:0}%{?_with_maven:1}
-%define without_maven %{?_with_maven:0}%{!?_with_maven:1}
+%define with_maven %{!?_without_maven:1}%{?_without_maven:0}
+%define without_maven %{?_without_maven:1}%{!?_without_maven:0}
 %define gcj_support 1
 
 Name:           plexus-utils
-Version:        1.2
-Release:        %mkrel 2.1.2
+Version:        1.4.5
+Release:        %mkrel 1.0.1
 Epoch:          0
 Summary:        Plexus Common Utilities
 License:        Apache License
@@ -45,8 +45,8 @@ Group:          Development/Java
 URL:            http://plexus.codehaus.org/
 # svn export svn://svn.plexus.codehaus.org/plexus/tags/plexus-utils-1.2/
 # tar xzf plexus-utils-1.2.tar.gz plexus-utils-1.2
-Source0:        plexus-utils-1.2.tar.gz
-Source1:        plexus-utils-1.2-build.xml
+Source0:        plexus-utils-1.4.5.tar.gz
+Source1:        plexus-utils-1.4.5-build.xml
 # build it with maven2-generated ant build.xml
 %if %{gcj_support}
 BuildRequires:  java-gcj-compat-devel
@@ -61,7 +61,8 @@ BuildRequires:  jpackage-utils >= 0:1.6
 Requires:       jpackage-utils
 Requires(postun): jpackage-utils
 %if %{with_maven}
-BuildRequires:  maven2
+BuildRequires:  maven2 >= 0:2.0.4
+BuildRequires:  maven2-plugin-surefire
 %endif
 
 %description
@@ -83,30 +84,28 @@ Javadoc for %{name}.
 
 
 %prep
-%setup -q -n plexus-utils-1.2
+%setup -q -n %{name}-%{version}
 cp %{SOURCE1} build.xml
 
 # Disable file utils test cases. See:
 # https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=228419
-rm -f src/test/java/org/codehaus/plexus/util/FileUtilsTest.java
+#rm -f src/test/java/org/codehaus/plexus/util/FileUtilsTest.java
 
 # TODO: Find out why this test keeps freezing
-rm -f src/test/java/org/codehaus/plexus/util/interpolation/RegexBasedInterpolatorTest.java
+#rm -f src/test/java/org/codehaus/plexus/util/interpolation/RegexBasedInterpolatorTest.java
 
 %build
 %if %{with_maven}
-mkdir -p .maven/repository/maven/jars
-build-jar-repository .maven/repository/maven/jars \
-maven-jelly-tags
+export MAVEN_REPO_LOCAL=`pwd`/.m2/repository
 
-export MAVEN_HOME_LOCAL=$(pwd)/.maven
-maven \
-        -Dmaven.repo.remote=file:/usr/share/maven/repository \
-        -Dmaven.home.local=$MAVEN_HOME_LOCAL \
-        jar:install javadoc 
+mvn-jpp -e \
+    -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+    install javadoc:javadoc
+
 
 %else
-%{ant} jar javadoc
+export CLASSPATH=target/classes:target/test-classes
+%{ant} -Dbuild.sysclasspath=only jar javadoc
 %endif
 
 %install
@@ -115,10 +114,16 @@ rm -rf $RPM_BUILD_ROOT
 install -d -m 755 $RPM_BUILD_ROOT%{_javadir}/plexus
 install -pm 644 target/%{name}-%{version}.jar \
   $RPM_BUILD_ROOT%{_javadir}/plexus/utils-%{version}.jar
+%add_to_maven_depmap org.codehaus.plexus %{name} %{version} JPP/%{parent} %{subname}
 (cd $RPM_BUILD_ROOT%{_javadir}/plexus && for jar in *-%{version}*; do ln -sf ${jar} `echo $jar| sed  "s|-%{version}||g"`; done)
+
+# pom
+install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms
+install -pm 644 pom.xml $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP.%{parent}-%{subname}.pom
+
 # javadoc
 install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-cp -pr target/docs/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+cp -pr target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
 ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 %if %{gcj_support}
@@ -128,17 +133,23 @@ ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%if %{gcj_support}
 %post
+%update_maven_depmap
+%if %{gcj_support}
 %{update_gcjdb}
+%endif
 
 %postun
+%update_maven_depmap
+%if %{gcj_support}
 %{clean_gcjdb}
 %endif
 
 %files
 %defattr(-,root,root,-)
 %{_javadir}/*
+%{_datadir}/maven2
+%{_mavendepmapfragdir}
 %if %{gcj_support}
 %dir %{_libdir}/gcj/%{name}
 %attr(-,root,root) %{_libdir}/gcj/%{name}/*
