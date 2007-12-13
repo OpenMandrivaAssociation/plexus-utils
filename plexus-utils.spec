@@ -35,9 +35,13 @@
 %define without_maven %{?_without_maven:1}%{!?_without_maven:0}
 %define gcj_support 1
 
+%define parent plexus
+%define subname utils
+
+
 Name:           plexus-utils
 Version:        1.4.5
-Release:        %mkrel 1.0.1
+Release:        %mkrel 1.0.2
 Epoch:          0
 Summary:        Plexus Common Utilities
 License:        Apache License
