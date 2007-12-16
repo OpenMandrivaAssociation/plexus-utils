@@ -41,7 +41,7 @@
 
 Name:           plexus-utils
 Version:        1.4.5
-Release:        %mkrel 1.0.2
+Release:        %mkrel 1.0.3
 Epoch:          0
 Summary:        Plexus Common Utilities
 License:        Apache License
@@ -61,7 +61,7 @@ BuildRequires:  java-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires:  ant
-BuildRequires:  jpackage-utils >= 0:1.6
+BuildRequires:  java-rpmbuild >= 0:1.6
 Requires:       jpackage-utils
 Requires(postun): jpackage-utils
 %if %{with_maven}
