@@ -28,8 +28,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# If you want to build with maven,
-# give rpmbuild option '--with maven'
+# If you don't want to build with maven, and use straight ant instead,
+# give rpmbuild option '--without maven'
 
 %define with_maven %{!?_without_maven:1}%{?_without_maven:0}
 %define without_maven %{?_without_maven:1}%{!?_without_maven:0}
@@ -40,17 +40,17 @@
 
 
 Name:           plexus-utils
-Version:        1.4.5
-Release:        %mkrel 1.0.3
+Version:        1.4.8
+Release:        %mkrel 1.0.1
 Epoch:          0
 Summary:        Plexus Common Utilities
 License:        Apache License
 Group:          Development/Java
 URL:            http://plexus.codehaus.org/
-# svn export svn://svn.plexus.codehaus.org/plexus/tags/plexus-utils-1.2/
-# tar xzf plexus-utils-1.2.tar.gz plexus-utils-1.2
-Source0:        plexus-utils-1.4.5.tar.gz
-Source1:        plexus-utils-1.4.5-build.xml
+# svn export svn://svn.plexus.codehaus.org/plexus/tags/plexus-utils-1.8/
+# tar xzf plexus-utils-1.8.tar.gz plexus-utils-1.8
+Source0:        plexus-utils-1.4.8.tar.gz
+Source1:        plexus-utils-1.4.8-build.xml
 # build it with maven2-generated ant build.xml
 %if %{gcj_support}
 BuildRequires:  java-gcj-compat-devel
@@ -59,7 +59,7 @@ BuildArch:      noarch
 BuildRequires:  java-devel
 %endif
 
-BuildRequires:  ant
+BuildRequires:  ant >= 0:1.6.5
 BuildRequires:  java-rpmbuild >= 0:1.6
 Requires:       jpackage-utils
 Requires(postun): jpackage-utils
@@ -73,6 +73,7 @@ BuildRequires:  maven2-plugin-install
 BuildRequires:  maven2-plugin-release
 BuildRequires:  maven2-plugin-javadoc
 %endif
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
 The Plexus project seeks to create end-to-end developer tools for 
@@ -95,13 +96,6 @@ Javadoc for %{name}.
 %prep
 %setup -q -n %{name}-%{version}
 cp %{SOURCE1} build.xml
-
-# Disable file utils test cases. See:
-# https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=228419
-#rm -f src/test/java/org/codehaus/plexus/util/FileUtilsTest.java
-
-# TODO: Find out why this test keeps freezing
-#rm -f src/test/java/org/codehaus/plexus/util/interpolation/RegexBasedInterpolatorTest.java
 
 %build
 %if %{with_maven}
@@ -158,7 +152,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_javadir}/*
 %{_datadir}/maven2
-%{_mavendepmapfragdir}
+%config(noreplace) %{_mavendepmapfragdir}/*
 %if %{gcj_support}
 %dir %{_libdir}/gcj/%{name}
 %attr(-,root,root) %{_libdir}/gcj/%{name}/*
