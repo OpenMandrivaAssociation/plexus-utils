@@ -28,60 +28,44 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# If you don't want to build with maven, and use straight ant instead,
-# give rpmbuild option '--without maven'
-
-%define with_maven %{!?_without_maven:1}%{?_without_maven:0}
-%define without_maven %{?_without_maven:1}%{!?_without_maven:0}
-%define gcj_support 1
-
 %define parent plexus
 %define subname utils
 
-
 Name:           plexus-utils
-Version:        1.4.8
-Release:        %mkrel 1.0.1
-Epoch:          0
+Version:        2.0.5
+Release:        3
 Summary:        Plexus Common Utilities
-License:        Apache License
+License:        ASL 1.1 and ASL 2.0 and MIT
 Group:          Development/Java
 URL:            http://plexus.codehaus.org/
-# svn export svn://svn.plexus.codehaus.org/plexus/tags/plexus-utils-1.8/
-# tar xzf plexus-utils-1.8.tar.gz plexus-utils-1.8
-Source0:        plexus-utils-1.4.8.tar.gz
-Source1:        plexus-utils-1.4.8-build.xml
-# build it with maven2-generated ant build.xml
-%if %{gcj_support}
-BuildRequires:  java-gcj-compat-devel
-%else
-BuildArch:      noarch
-BuildRequires:  java-devel
-%endif
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
+Source0:        plexus-utils-%{version}.tar.gz
+# svn export http://svn.codehaus.org/plexus/plexus-utils/tags/plexus-utils-2.0.1/
+Patch0:         plexus-utils-remove-release-plugin.patch
 
-BuildRequires:  ant >= 0:1.6.5
-BuildRequires:  java-rpmbuild >= 0:1.6
+BuildArch:      noarch
+BuildRequires:  jpackage-utils >= 0:1.6
 Requires:       jpackage-utils
 Requires(postun): jpackage-utils
-%if %{with_maven}
-BuildRequires:  maven2 >= 0:2.0.4
-BuildRequires:  maven2-plugin-surefire
-BuildRequires:  maven2-plugin-resources
-BuildRequires:  maven2-plugin-compiler
-BuildRequires:  maven2-plugin-jar
-BuildRequires:  maven2-plugin-install
-BuildRequires:  maven2-plugin-release
-BuildRequires:  maven2-plugin-javadoc
-%endif
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+
+BuildRequires:  maven2
+BuildRequires:  maven-compiler-plugin
+BuildRequires:  maven-install-plugin
+BuildRequires:  maven-jar-plugin
+BuildRequires:  maven-javadoc-plugin
+BuildRequires:  maven-resources-plugin
+BuildRequires:  maven-surefire-plugin
+BuildRequires:  maven-doxia-sitetools
+BuildRequires:  maven-surefire-provider-junit
+
+Requires(post):    jpackage-utils >= 0:1.7.2
+Requires(postun):  jpackage-utils >= 0:1.7.2
 
 %description
-The Plexus project seeks to create end-to-end developer tools for 
-writing applications. At the core is the container, which can be 
-embedded or for a full scale application server. There are many 
-reusable components for hibernate, form processing, jndi, i18n, 
-velocity, etc. Plexus also includes an application server which 
+The Plexus project seeks to create end-to-end developer tools for
+writing applications. At the core is the container, which can be
+embedded or for a full scale application server. There are many
+reusable components for hibernate, form processing, jndi, i18n,
+velocity, etc. Plexus also includes an application server which
 is like a J2EE application server, without all the baggage.
 
 %package javadoc
@@ -93,73 +77,54 @@ Requires(postun): jpackage-utils
 %description javadoc
 Javadoc for %{name}.
 
-
 %prep
-%setup -q -n %{name}-%{version}
-cp %{SOURCE1} build.xml
+%setup -q
+%patch0 -p1
 
 %build
-%if %{with_maven}
-export MAVEN_REPO_LOCAL=`pwd`/.m2/repository
+export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
+mkdir -p $MAVEN_REPO_LOCAL
 
-mvn-jpp -e \
+mvn-jpp \
     -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
     install javadoc:javadoc
 
-
-%else
-export CLASSPATH=target/classes:target/test-classes
-%{ant} -Dbuild.sysclasspath=only jar javadoc
-%endif
-
 %install
-rm -rf $RPM_BUILD_ROOT
 # jars
-install -d -m 755 $RPM_BUILD_ROOT%{_javadir}/plexus
+install -d -m 755 $RPM_BUILD_ROOT%{_javadir}/%{parent}
 install -pm 644 target/%{name}-%{version}.jar \
-  $RPM_BUILD_ROOT%{_javadir}/plexus/utils-%{version}.jar
-%add_to_maven_depmap org.codehaus.plexus %{name} %{version} JPP/%{parent} %{subname}
-(cd $RPM_BUILD_ROOT%{_javadir}/plexus && for jar in *-%{version}*; do ln -sf ${jar} `echo $jar| sed  "s|-%{version}||g"`; done)
+  $RPM_BUILD_ROOT%{_javadir}/plexus/utils.jar
 
 # pom
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms
-install -pm 644 pom.xml $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP.%{parent}-%{subname}.pom
+install -d -m 755 $RPM_BUILD_ROOT%{_mavenpomdir}
+install -pm 644 pom.xml $RPM_BUILD_ROOT%{_mavenpomdir}/JPP.%{parent}-%{subname}.pom
+
+%add_to_maven_depmap org.codehaus.plexus %{name} %{version} JPP/%{parent} %{subname}
+# compatibility depmap
+%add_to_maven_depmap plexus %{name} %{version} JPP/%{parent} %{subname}
 
 # javadoc
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-cp -pr target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
-
-%if %{gcj_support}
-%{_bindir}/aot-compile-rpm
-%endif
-
-%clean
-rm -rf $RPM_BUILD_ROOT
+install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+cp -pr target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 %post
 %update_maven_depmap
-%if %{gcj_support}
-%{update_gcjdb}
-%endif
 
 %postun
 %update_maven_depmap
-%if %{gcj_support}
-%{clean_gcjdb}
-%endif
+
+%pre javadoc
+# workaround for rpm bug, can be removed in F-17
+[ $1 -gt 1 ] && [ -L %{_javadocdir}/%{name} ] && \
+rm -rf $(readlink -f %{_javadocdir}/%{name}) %{_javadocdir}/%{name} || :
 
 %files
 %defattr(-,root,root,-)
 %{_javadir}/*
-%{_datadir}/maven2
-%config(noreplace) %{_mavendepmapfragdir}/*
-%if %{gcj_support}
-%dir %{_libdir}/gcj/%{name}
-%attr(-,root,root) %{_libdir}/gcj/%{name}/*
-%endif
+%{_mavenpomdir}/*
+%{_mavendepmapfragdir}/*
 
 %files javadoc
 %defattr(-,root,root,-)
-%doc %{_javadocdir}/%{name}-%{version}
 %doc %{_javadocdir}/%{name}
+
