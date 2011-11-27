@@ -33,7 +33,7 @@
 
 Name:           plexus-utils
 Version:        2.0.5
-Release:        3
+Release:        5
 Summary:        Plexus Common Utilities
 License:        ASL 1.1 and ASL 2.0 and MIT
 Group:          Development/Java
