@@ -38,41 +38,39 @@
 %define subname utils
 
 
-Name:           plexus-utils
-Version:        1.4.8
-Release:        1.0.2
-Epoch:          0
-Summary:        Plexus Common Utilities
-License:        Apache License
-Group:          Development/Java
-URL:            http://plexus.codehaus.org/
+Summary:	Plexus Common Utilities
+Name:		plexus-utils
+Version:	1.4.8
+Release:	1.0.2
+License:	Apache License
+Group:		Development/Java
+Url:		http://plexus.codehaus.org/
 # svn export svn://svn.plexus.codehaus.org/plexus/tags/plexus-utils-1.8/
 # tar xzf plexus-utils-1.8.tar.gz plexus-utils-1.8
-Source0:        plexus-utils-1.4.8.tar.gz
-Source1:        plexus-utils-1.4.8-build.xml
+Source0:	plexus-utils-1.4.8.tar.gz
+Source1:	plexus-utils-1.4.8-build.xml
 # build it with maven2-generated ant build.xml
-%if %{gcj_support}
-BuildRequires:  java-gcj-compat-devel
+%if !%{gcj_support}
+BuildArch:	noarch
+BuildRequires:	java-devel
 %else
-BuildArch:      noarch
-BuildRequires:  java-devel
+BuildRequires:	java-gcj-compat-devel
 %endif
-
-BuildRequires:  ant >= 0:1.6.5
-BuildRequires:  locales-en
-BuildRequires:  java-rpmbuild >= 0:1.6
-Requires:       jpackage-utils
-Requires(postun): jpackage-utils
+BuildRequires:	ant >= 0:1.6.5
+BuildRequires:	locales-en
+BuildRequires:	java-rpmbuild >= 0:1.6
 %if %{with_maven}
-BuildRequires:  maven2 >= 0:2.0.4
-BuildRequires:  maven2-plugin-surefire
-BuildRequires:  maven2-plugin-resources
-BuildRequires:  maven2-plugin-compiler
-BuildRequires:  maven2-plugin-jar
-BuildRequires:  maven2-plugin-install
-BuildRequires:  maven2-plugin-release
-BuildRequires:  maven2-plugin-javadoc
+BuildRequires:	maven2 >= 0:2.0.4
+BuildRequires:	maven2-plugin-surefire
+BuildRequires:	maven2-plugin-resources
+BuildRequires:	maven2-plugin-compiler
+BuildRequires:	maven2-plugin-jar
+BuildRequires:	maven2-plugin-install
+BuildRequires:	maven2-plugin-release
+BuildRequires:	maven2-plugin-javadoc
 %endif
+Requires:	jpackage-utils
+Requires(postun):	jpackage-utils
 
 %description
 The Plexus project seeks to create end-to-end developer tools for 
@@ -83,17 +81,16 @@ velocity, etc. Plexus also includes an application server which
 is like a J2EE application server, without all the baggage.
 
 %package javadoc
-Summary:          Javadoc for %{name}
-Group:            Development/Java
-Requires:         jpackage-utils
-Requires(postun): jpackage-utils
+Summary:	Javadoc for %{name}
+Group:		Development/Java
+Requires:	jpackage-utils
+Requires(postun):	jpackage-utils
 
 %description javadoc
 Javadoc for %{name}.
 
-
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 cp %{SOURCE1} build.xml
 
 %build
@@ -113,20 +110,20 @@ export CLASSPATH=target/classes:target/test-classes
 
 %install
 # jars
-install -d -m 755 $RPM_BUILD_ROOT%{_javadir}/plexus
+install -d -m 755 %{buildroot}%{_javadir}/plexus
 install -pm 644 target/%{name}-%{version}.jar \
-  $RPM_BUILD_ROOT%{_javadir}/plexus/utils-%{version}.jar
+  %{buildroot}%{_javadir}/plexus/utils-%{version}.jar
 %add_to_maven_depmap org.codehaus.plexus %{name} %{version} JPP/%{parent} %{subname}
-(cd $RPM_BUILD_ROOT%{_javadir}/plexus && for jar in *-%{version}*; do ln -sf ${jar} `echo $jar| sed  "s|-%{version}||g"`; done)
+(cd %{buildroot}%{_javadir}/plexus && for jar in *-%{version}*; do ln -sf ${jar} `echo $jar| sed  "s|-%{version}||g"`; done)
 
 # pom
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms
-install -pm 644 pom.xml $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP.%{parent}-%{subname}.pom
+install -d -m 755 %{buildroot}%{_datadir}/maven2/poms
+install -pm 644 pom.xml %{buildroot}%{_datadir}/maven2/poms/JPP.%{parent}-%{subname}.pom
 
 # javadoc
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-cp -pr target/site/apidocs/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+install -d -m 755 %{buildroot}%{_javadocdir}/%{name}-%{version}
+cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}-%{version}
+ln -s %{name}-%{version} %{buildroot}%{_javadocdir}/%{name}
 
 %if %{gcj_support}
 %{_bindir}/aot-compile-rpm
@@ -145,7 +142,6 @@ ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 %endif
 
 %files
-%defattr(-,root,root,-)
 %{_javadir}/*
 %{_datadir}/maven2
 %config(noreplace) %{_mavendepmapfragdir}/*
@@ -155,52 +151,6 @@ ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 %endif
 
 %files javadoc
-%defattr(-,root,root,-)
 %doc %{_javadocdir}/%{name}-%{version}
 %doc %{_javadocdir}/%{name}
 
-
-%changelog
-* Wed Jan 02 2008 David Walluck <walluck@mandriva.org> 1.4.8-1.0.1mdv2008.1
-+ Revision: 140673
-- 1.4.8-1jpp (JPP 5.0)
-
-  + Thierry Vignaud <tvignaud@mandriva.com>
-    - kill re-definition of %%buildroot on Pixel's request
-
-* Sun Dec 16 2007 Anssi Hannula <anssi@mandriva.org> 0:1.4.5-1.0.3mdv2008.1
-+ Revision: 121009
-- buildrequire java-rpmbuild, i.e. build with icedtea on x86(_64)
-
-* Thu Dec 13 2007 Alexander Kurtakov <akurtakov@mandriva.org> 0:1.4.5-1.0.2mdv2008.1
-+ Revision: 119217
-- really fix maven depmap
-
-* Tue Dec 11 2007 Alexander Kurtakov <akurtakov@mandriva.org> 0:1.4.5-1.0.1mdv2008.1
-+ Revision: 117503
-- fix maven2-pluging-* BRs
-- add maven poms (jpp sync)
-
-* Sat Sep 15 2007 Anssi Hannula <anssi@mandriva.org> 0:1.2-2.1.2mdv2008.0
-+ Revision: 87327
-- rebuild to filter out autorequires of GCJ AOT objects
-- remove unnecessary Requires(post) on java-gcj-compat
-
-* Wed Jul 04 2007 David Walluck <walluck@mandriva.org> 0:1.2-2.1.1mdv2008.0
-+ Revision: 47815
-- fix gcj support
-- Import plexus-utils
-
-
-
-* Mon Feb 20 2007 Deepak Bhole <dbhole@redhat.com> - 0:1.2-2jpp.1.fc7
-- Fix spec per Fedora guidelines
-
-* Fri Jun 16 2006 Ralph Apel <r.apel@r-apel.de> - 0:1.2-1jpp
-- Upgrade to 1.2
-
-* Wed Jan 04 2006 Fernando Nasser <fnasser@redhat.com> - 0:1.0.4-2jpp
-- First JPP 1.7 build
-
-* Mon Nov 07 2005 Ralph Apel <r.apel at r-apel.de> - 0:1.0.4-1jpp
-- First JPackage build
