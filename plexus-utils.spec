@@ -41,7 +41,7 @@
 Summary:	Plexus Common Utilities
 Name:		plexus-utils
 Version:	1.4.8
-Release:	1.0.3
+Release:	1.0.4
 License:	Apache License
 Group:		Development/Java
 Url:		http://plexus.codehaus.org/
