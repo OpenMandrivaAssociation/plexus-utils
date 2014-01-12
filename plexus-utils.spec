@@ -34,7 +34,7 @@
 
 Name:           plexus-utils
 Version:        3.0.14
-Release:        1.0%{?dist}
+Release:        1.1%{?dist}
 Summary:        Plexus Common Utilities
 # ASL 1.1: several files in src/main/java/org/codehaus/plexus/util/ 
 # xpp: src/main/java/org/codehaus/plexus/util/xml/pull directory
@@ -100,6 +100,11 @@ cp %{SOURCE1} .
             </instructions>
           </configuration>
         </plugin>"
+%mvn_file : %{name} plexus/classworlds
+%if 0%{?fedora}
+%else
+%pom_add_dep junit:junit::test
+%endif
 
 %build
 mvn-rpmbuild install javadoc:javadoc -Dmaven.test.failure.ignore=true
