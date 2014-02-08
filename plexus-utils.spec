@@ -40,7 +40,7 @@
 
 Name:           plexus-utils
 Version:        1.4.8
-Release:        1.0.2
+Release:        1.0.3
 Epoch:          0
 Summary:        Plexus Common Utilities
 License:        Apache License
