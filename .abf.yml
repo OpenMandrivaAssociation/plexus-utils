@@ -1,2 +1,4 @@
-sources:
+removed_sources:
   plexus-utils-3.0.14.tar.gz: 586bb8446fe6af9186007efe7450a8a33477302e
+sources:
+  plexus-utils-3.0.18.tar.gz: 483946ae82723df7c289a762df68abee5e1dabdd
