@@ -3,9 +3,10 @@
 %global subname utils
 
 Name:           plexus-utils
-Version:        3.0.18
-Release:        1%{?dist}
+Version:        3.0.22
+Release:        1.1
 Summary:        Plexus Common Utilities
+Group:		Development/Java
 # ASL 1.1: several files in src/main/java/org/codehaus/plexus/util/ 
 # xpp: src/main/java/org/codehaus/plexus/util/xml/pull directory
 # ASL 2.0 and BSD:
@@ -16,7 +17,7 @@ Summary:        Plexus Common Utilities
 # rest is ASL 2.0
 License:        ASL 1.1 and ASL 2.0 and xpp and BSD and Public Domain
 URL:            http://plexus.codehaus.org/
-Source0:        https://github.com/sonatype/%{name}/archive/%{name}-%{version}.tar.gz
+Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}.tar.gz
 Source1:        http://apache.org/licenses/LICENSE-2.0.txt
 BuildArch:      noarch
 
