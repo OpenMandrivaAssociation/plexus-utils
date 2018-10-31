@@ -4,7 +4,7 @@
 
 Name:           plexus-utils
 Version:        3.0.22
-Release:        1.1
+Release:        1.2
 Summary:        Plexus Common Utilities
 Group:		Development/Java
 # ASL 1.1: several files in src/main/java/org/codehaus/plexus/util/ 
