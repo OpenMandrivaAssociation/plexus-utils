@@ -21,6 +21,7 @@ Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{ver
 BuildArch:      noarch
 
 BuildRequires:  jdk-current
+BuildRequires:	javapackages-local
 
 %description
 The Plexus project seeks to create end-to-end developer tools for
