@@ -4,7 +4,7 @@
 
 Name:           plexus-utils
 Version:        3.2.0
-Release:        1
+Release:        2
 Summary:        Plexus Common Utilities
 Group:		Development/Java
 # ASL 1.1: several files in src/main/java/org/codehaus/plexus/util/ 
@@ -48,6 +48,14 @@ cd src/main/java
 cat >module-info.java <<'EOF'
 module org.codehaus.plexus.util {
 	exports org.codehaus.plexus.util;
+	exports org.codehaus.plexus.util.cli;
+	exports org.codehaus.plexus.util.cli.shell;
+	exports org.codehaus.plexus.util.dag;
+	exports org.codehaus.plexus.util.introspection;
+	exports org.codehaus.plexus.util.io;
+	exports org.codehaus.plexus.util.reflection;
+	exports org.codehaus.plexus.util.xml;
+	exports org.codehaus.plexus.util.xml.pull;
 	requires java.sql;
 }
 EOF
