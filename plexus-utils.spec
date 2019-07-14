@@ -3,8 +3,8 @@
 %global subname utils
 
 Name:           plexus-utils
-Version:        3.2.0
-Release:        2
+Version:	3.2.1
+Release:	1
 Summary:        Plexus Common Utilities
 Group:		Development/Java
 # ASL 1.1: several files in src/main/java/org/codehaus/plexus/util/ 
