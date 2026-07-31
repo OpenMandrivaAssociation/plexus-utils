@@ -3,8 +3,8 @@
 %global subname utils
 
 Name:           plexus-utils
-Version:	3.2.1
-Release:	2
+Version:	3.5.1
+Release:	1
 Summary:        Plexus Common Utilities
 Group:		Development/Java
 # ASL 1.1: several files in src/main/java/org/codehaus/plexus/util/ 
@@ -38,7 +38,7 @@ Summary:          Javadoc for %{name}
 Javadoc for %{name}.
 
 %prep
-%setup -n %{name}-%{name}-%{version}
+%setup -n plexus-utils-plexus-utils-3.5.1
 # Fix up javadoc snippets
 find . -name "*.java" |xargs sed -i -e 's,<tt>,<code>,g;s,</tt>,</code>,g'
 
