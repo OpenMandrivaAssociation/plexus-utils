@@ -1,6 +1,6 @@
 Name:		plexus-utils
-Version:	3.6.2
-Release:	2
+Version:	3.6.4
+Release:	1
 Summary:	Plexus Common Utilities
 Group:		Development/Java
 # ASL 1.1: several files in src/main/java/org/codehaus/plexus/util/
@@ -23,16 +23,17 @@ BuildOption(install):	--file-name %{name}
 
 %description
 Utility classes shared by Plexus components: strings, files, command
-lines, XML, and related helpers. 3.6.2 is the current 3.x release and
+lines, XML, and related helpers. 3.6.4 is the current 3.x release and
 still ships Xpp3Dom and CachingOutputStream. Those classes left the
 jar in 4.x.
 
-3.6.1 checks archive entry paths with canonical paths before
-extraction, and directory scans no longer exclude **/.cvsignore by
-default. The jar manifest names the automatic module
-org.codehaus.plexus.util. 3.6.2 itself moves the parent POM to
-plexus 27. 3.6.2 stays the default jar. Gradle 9.9.1 strictly
-pins 3.6.1, so that jar is installed beside it.
+3.6.4 reports an unlistable directory as IOException, deletes files
+with Files.deleteIfExists, splits command lines on tabs and line
+breaks, and does not follow symlinks while deleting a directory.
+3.6.3 fixes an ArrayIndexOutOfBoundsException for a surrogate pair
+in an XML comment. The jar manifest names the automatic module
+org.codehaus.plexus.util. 3.6.4 stays the default jar. Gradle 9.9.1
+strictly pins 3.6.1, so that jar is installed beside it.
 
 %prep
 %autosetup -n plexus-utils-plexus-utils-%{version}
@@ -71,7 +72,7 @@ sysjar install --buildroot %{buildroot} \
 	--artifact pu361/plexus-utils.pom:pu361/plexus-utils.jar \
 	--file-name plexus-utils-3.6.1 \
 	--filelist .mfiles361
-# 3.6.2 owns plexus-utils.sysjar. 3.6.1 keeps a second index.
+# 3.6.4 owns plexus-utils.sysjar. 3.6.1 keeps a second index.
 /bin/mv %{buildroot}/usr/share/sysjar/index/org.codehaus.plexus/plexus-utils.sysjar \
 	%{buildroot}/usr/share/sysjar/index/org.codehaus.plexus/plexus-utils-3.6.1.sysjar
 sed -i 's|/usr/share/sysjar/index/org.codehaus.plexus/plexus-utils\.sysjar|/usr/share/sysjar/index/org.codehaus.plexus/plexus-utils-3.6.1.sysjar|' .mfiles361
@@ -97,9 +98,9 @@ public class PuSmoke {
 EOF
 "$JAVA_HOME/bin/javac" --release 8 -encoding UTF-8 -Xlint:-options \
 	-cp %{buildroot}%{_javadir}/plexus-utils.jar PuSmoke.java
-"$JAVA_HOME/bin/java" -cp "%{buildroot}%{_javadir}/plexus-utils.jar:." PuSmoke pu362_ok > check362.log
-cat check362.log
-grep -F -q 'pu362_ok a,b' check362.log
+"$JAVA_HOME/bin/java" -cp "%{buildroot}%{_javadir}/plexus-utils.jar:." PuSmoke pu364_ok > check364.log
+cat check364.log
+grep -F -q 'pu364_ok a,b' check364.log
 "$JAVA_HOME/bin/javac" --release 8 -encoding UTF-8 -Xlint:-options \
 	-cp %{buildroot}%{_javadir}/plexus-utils-3.6.1.jar PuSmoke.java
 "$JAVA_HOME/bin/java" -cp "%{buildroot}%{_javadir}/plexus-utils-3.6.1.jar:." PuSmoke pu361_ok > check361.log
